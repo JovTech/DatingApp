@@ -1,6 +1,7 @@
 ﻿using API.Data;
 using API.DTOs;
 using API.Entities;
+using API.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -10,15 +11,16 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace API.Controllers
 {
     public class AccountController : BaseApiController
     {
         private readonly DataContext _context;
-       // private readonly ITokenService _tokenService;
-        public AccountController(DataContext context)
+        private readonly ITokenService _tokenService;
+        public AccountController(DataContext context, ITokenService tokenService)
         {
-            //_tokenService = tokenService;
+            _tokenService = tokenService;
             _context = context;
         }
 
@@ -42,7 +44,7 @@ namespace API.Controllers
             return new UserDto
             {
                 Username = user.UserName,
-                //Token = _tokenService.CreateToken(user)
+                Token = _tokenService.CreateToken(user)
             };
         }
 
@@ -66,7 +68,7 @@ namespace API.Controllers
              return new UserDto
              {
                  Username = user.UserName,
-                // Token = _tokenService.CreateToken(user)
+                 Token = _tokenService.CreateToken(user)
              };
          }
         private async Task<bool> UserExists(string username)

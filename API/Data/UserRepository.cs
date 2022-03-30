@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using API.DataCLS.API.Data;
+using API.Data;
 using API.DTOs;
 using API.Entities;
 using API.Interfaces;
-using AutoMapper;
+using Helpers.AutoMapperProfile;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 

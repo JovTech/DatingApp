@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { env } from 'process';
 import { environment } from '../../environments/environment.prod';
 import { Member } from '../_models/members';
 

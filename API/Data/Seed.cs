@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using API.DataCLS.API.Data;
+using API.Data;
 using API.Entities;
 using Microsoft.EntityFrameworkCore;
 

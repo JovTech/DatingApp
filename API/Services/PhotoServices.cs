@@ -19,19 +19,19 @@ namespace API.Services
     public class PhotoService : IPhotoService
     {
         private readonly Cloudinary _cloudinary;
-        public PhotoService(IOptions<CloudinarySetings> config)
+        public PhotoService(IOptions<CloudinarySettings> config)
         {
             var acc = new Account
             (
-                config.value.CloudName,
-                config.value.ApiKey,
-                config.value.ApiSecret
+                config.Value.CloudName,
+                config.Value.ApiKey,
+                config.Value.ApiSecret
             );
 
             _cloudinary = new Cloudinary(acc);
         }
 
-        Task<ImageUploadResult> AddPhotoAsync(IFormFile file)
+        Async Task<ImageUploadResult> AddPhotoAsync(IFormFile file)
         {
             var uploadResult = new ImageUploadResult();
 
@@ -49,7 +49,7 @@ namespace API.Services
             return uploadResult;
         }
 
-        Task<IDeletionResult> DeletePhotoAsync(string publicId)
+        async Task<IDeletionResult> DeletePhotoAsync(string publicId)
         {
             var deleteParams = new DeletionParams(publicId);
 

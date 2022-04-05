@@ -9,6 +9,9 @@ import { Member } from '../_models/members';
   providedIn: 'root'
 })
 export class MembersService {
+  updateMember(member: Member) {
+    throw new Error('Method not implemented.');
+  }
   baseUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) { }

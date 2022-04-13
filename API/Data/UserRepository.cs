@@ -5,9 +5,10 @@ using API.Data;
 using API.DTOs;
 using API.Entities;
 using API.Interfaces;
-using Helpers.AutoMapperProfile;
+using API.Helpers;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 
 namespace API.Data
 {

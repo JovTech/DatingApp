@@ -10,6 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
 using API.Extentions;
+using API.Services;
+using System.Security.Claims;
+using System.Linq;
 
 namespace API.Controllers
 {
@@ -22,8 +25,8 @@ namespace API.Controllers
 
         private readonly IMapper _mapper;
 
-        private readonly IPhotoService _photoService;
-        public UsersController(IUserRepository userRepository, IMapper mapper, IPhotoService photoService)
+        private readonly IPhotoServices _photoService;
+        public UsersController(IUserRepository userRepository, IMapper mapper, IPhotoServices photoService)
         {
             _photoService = photoService;
             _mapper = mapper;            
@@ -47,7 +50,7 @@ namespace API.Controllers
             return await _userRepository.GetMemberAsync(username);
         }
 
-         public async Task<ActionResult>UpdateUser(MemberUpdateDto memberUpdateDto)
+         public async Task<ActionResult>UpdateUser(MemberDto memberUpdateDto)
         {
            var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
            var user = await _userRepository.GetUserByUsernameAsync(username);
@@ -78,14 +81,14 @@ namespace API.Controllers
 
             if(user.Photos.Count == 0)
             {
-                Photo.IsMain = true;
+                photo.IsMain = true;
             }
 
             user.Photos.Add(photo);
 
             if(await _userRepository.SaveAllAsync())
             {
-                return CreatedAtRoute("GetUser", new {username = User.UserName} ,_mapper.Map<PhotoDto>(photo));
+                return CreatedAtRoute("GetUser", new {username = user.UserName} ,_mapper.Map<PhotoDto>(photo));
             }
                 
             
@@ -102,7 +105,7 @@ namespace API.Controllers
             if(photo.IsMain) return BadRequest("This is already your main photo");
 
             var currentMain = user.Photos.FirstOrDefault(x => x.IsMain);
-            if(currentMain =! null) currentMain.IsMain = false;
+            if(currentMain != null) currentMain.IsMain = false;
             photo.IsMain = true;
 
              if(await _userRepository.SaveAllAsync()) return NoContent();
@@ -117,7 +120,7 @@ namespace API.Controllers
 
             var photo = user.Photos.FirstOrDefault(x => x.Id == photoId);
 
-            if(photo == null) return NotFound;
+            if(photo == null) return NotFound();
 
             if(photo.IsMain) return BadRequest("You cannot delete your main photo");
 

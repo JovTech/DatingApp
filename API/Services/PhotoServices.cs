@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-
+using System.Threading.Tasks;
 using API.Entities;
 using API.Helpers;
 using API.Interfaces;
-using CoudinaryDotNet;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
 using Microsoft.IdentityModel.Tokens;
@@ -16,7 +18,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace API.Services
 {
-    public class PhotoService : IPhotoService
+    public class PhotoService : IPhotoServices
     {
         private readonly Cloudinary _cloudinary;
         public PhotoService(IOptions<CloudinarySettings> config)
@@ -31,13 +33,13 @@ namespace API.Services
             _cloudinary = new Cloudinary(acc);
         }
 
-        Async Task<ImageUploadResult> AddPhotoAsync(IFormFile file)
+        public async Task<ImageUploadResult> AddPhotoAsync(IFormFile file)
         {
             var uploadResult = new ImageUploadResult();
 
-            if(file.Length > 0)
+            if (file.Length > 0)
             {
-                await using var stream = file.OpenUploadStream();
+                await using var stream = file.OpenReadStream();
                 var uploadParams = new ImageUploadParams
                 {
                     File = new FileDescription(file.FileName, stream),
@@ -49,7 +51,7 @@ namespace API.Services
             return uploadResult;
         }
 
-        async Task<IDeletionResult> DeletePhotoAsync(string publicId)
+        public async Task<DeletionResult> DeletePhotoAsync(string publicId)
         {
             var deleteParams = new DeletionParams(publicId);
 
@@ -57,5 +59,7 @@ namespace API.Services
 
             return result;
         }
+
+
     }
 }

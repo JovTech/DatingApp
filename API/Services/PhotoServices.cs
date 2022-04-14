@@ -1,10 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
-using API.Entities;
 using API.Helpers;
 using API.Interfaces;
 using CloudinaryDotNet;
@@ -12,13 +6,9 @@ using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
-using Microsoft.IdentityModel.Tokens;
-
-
-
 namespace API.Services
 {
-    public class PhotoService : IPhotoServices
+    public class PhotoService : IPhotoService
     {
         private readonly Cloudinary _cloudinary;
         public PhotoService(IOptions<CloudinarySettings> config)
@@ -39,7 +29,7 @@ namespace API.Services
 
             if (file.Length > 0)
             {
-                await using var stream = file.OpenReadStream();
+                using var stream = file.OpenReadStream();
                 var uploadParams = new ImageUploadParams
                 {
                     File = new FileDescription(file.FileName, stream),
@@ -59,7 +49,5 @@ namespace API.Services
 
             return result;
         }
-
-
     }
 }

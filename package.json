@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@angular/cdk": "^13.3.3",
+    "ngx-spinner": "^13.1.1"
+  }
+}

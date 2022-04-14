@@ -5,8 +5,8 @@ import {Photo} from './photo'
     Gender: string;
     DateOfBirth: string;
     KnownAs: string;
-    Created: DateTime;
-    LastActive: DateTime;
+    Created: Date;
+    LastActive: Date;
     Introduction: string;
     LookingFor: string;
     Interests: string;

@@ -18,7 +18,7 @@ import { ErrorInterceptor } from './_interceptors/error.interceptor';
 import { NotFoundComponent } from './errors/not-found/not-found.component';
 import { ServerErrorComponent } from './errors/server-error/server-error.component';
 import { MemberCardComponent } from './members/member-card/member-card.component';
-import { JwlInterceptor } from './_interceptors/jwl.interceptor';
+import { JwtInterceptor } from './_interceptors/jwl.interceptor';
 import { PhotoEditorComponent } from './members/photo-editor/photo-editor.component';
 
 
@@ -48,7 +48,7 @@ import { PhotoEditorComponent } from './members/photo-editor/photo-editor.compon
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: JwlInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
   ],
   bootstrap: [AppComponent]
 })

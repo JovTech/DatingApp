@@ -1,17 +1,12 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { environment } from '../../environments/environment.prod';
+import { environment } from 'src/environments/environment';
+import { HttpClient } from '@angular/common/http';
 import { Member } from '../_models/members';
-
-
 
 @Injectable({
   providedIn: 'root'
 })
 export class MembersService {
-  updateMember(member: Member) {
-    throw new Error('Method not implemented.');
-  }
   baseUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
@@ -20,7 +15,7 @@ export class MembersService {
     return this.http.get<Member[]>(this.baseUrl + 'users');
   }
 
-  getMember(username) {
-    return this.http.get<Member>(this.baseUrl + 'users' + username);
+  getMember(username: string) {
+    return this.http.get<Member>(this.baseUrl + 'users/' + username);
   }
 }

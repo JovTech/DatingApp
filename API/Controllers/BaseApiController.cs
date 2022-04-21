@@ -15,4 +15,8 @@ namespace API.Controllers
     {
 
     }
+
+    internal class LogUserActivity
+    {
+    }
 }

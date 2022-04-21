@@ -8,7 +8,7 @@ using Microsoft.Extensions.Options;
 
 namespace API.Services
 {
-    public class PhotoService : IPhotoService
+    public class PhotoService : IPhotoServices
     {
         private readonly Cloudinary _cloudinary;
         public PhotoService(IOptions<CloudinarySettings> config)

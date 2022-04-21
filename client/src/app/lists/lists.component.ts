@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Member } from '../_models/member';
+import { Member } from '../_models/members';
 import { Pagination } from '../_models/pagination';
 import { MembersService } from '../_services/members.service';
 

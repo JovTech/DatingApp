@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using API.Helpers;
-using API.Helpeers;
+using API.SignalR;
 using API.Controllers;
 
 namespace API.Extensions
@@ -19,6 +19,7 @@ namespace API.Extensions
         {
             public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration config)
             {
+                services.AddSingleton<PresenceTracker>();
                 services.Configure<CloudinarySettings>(config.GetSection("CloudinarySettings"));
                 services.AddScoped<ITokenService, TokenService>();
                 services.AddScoped<IPhotoServices, PhotoService>();

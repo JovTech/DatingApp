@@ -6,23 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-namespace API.Data
-{
-    public class DataContext : IdentityDbContext<AppUser, AppRole, int,
-        IdentityUserClaim<int>, AppUserRole, IdentityUserLogin<int>,
-        IdentityRoleClaim<int>, IdentityUserToken<int>>
-    {
-        public DataContext(DbContextOptions options) : base(options)
-        {
-        }
-using System;
-using API.Entities;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+
 namespace API.Data
 {
     public class DataContext : IdentityDbContext<AppUser, AppRole, int,
@@ -34,10 +18,12 @@ namespace API.Data
         }
 
         public DbSet<UserLike> Likes { get; set; }
+        public DbSet<UserView> Views { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<Photo> Photos { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<Connection> Connections { get; set; }
+        public object Views { get; internal set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -46,69 +32,51 @@ namespace API.Data
             builder.Entity<AppUser>()
                 .HasMany(ur => ur.UserRoles)
                 .WithOne(u => u.User)
-
-    
-          
-            
-    
-
-          
-          
-            
-    
-
-          
-    
-    @@ -69,6 +65,8 @@ protected override void OnModelCreating(ModelBuilder builder)
-  
                 .HasForeignKey(ur => ur.UserId)
                 .IsRequired();
+
             builder.Entity<AppRole>()
                 .HasMany(ur => ur.UserRoles)
                 .WithOne(u => u.Role)
                 .HasForeignKey(ur => ur.RoleId)
                 .IsRequired();
+
+
             builder.Entity<UserLike>()
                 .HasKey(k => new { k.SourceUserId, k.LikedUserId });
+
             builder.Entity<UserLike>()
                 .HasOne(s => s.SourceUser)
                 .WithMany(l => l.LikedUsers)
                 .HasForeignKey(s => s.SourceUserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
             builder.Entity<UserLike>()
                 .HasOne(s => s.LikedUser)
                 .WithMany(l => l.LikedByUsers)
                 .HasForeignKey(s => s.LikedUserId)
                 .OnDelete(DeleteBehavior.Cascade);
-            builder.Entity<Message>()
-                .HasOne(u => u.Recipient)
-                .WithMany(m => m.MessagesReceived)
-                .OnDelete(DeleteBehavior.Restrict);
-            builder.Entity<Message>()
-                .HasOne(u => u.Sender)
-                .HasForeignKey(ur => ur.UserId)
-                .IsRequired();
-            builder.Entity<AppRole>()
-                .HasMany(ur => ur.UserRoles)
-                .WithOne(u => u.Role)
-                .HasForeignKey(ur => ur.RoleId)
-                .IsRequired();
-            builder.Entity<UserLike>()
-                .HasKey(k => new { k.SourceUserId, k.LikedUserId });
-            builder.Entity<UserLike>()
+
+            builder.Entity<UserView>()
+                .HasKey(k => new { k.SourceUserId, k.viewedUserId });
+
+            builder.Entity<UserView>()
                 .HasOne(s => s.SourceUser)
-                .WithMany(l => l.LikedUsers)
+                .WithMany(l => l.ViewedUsers)
                 .HasForeignKey(s => s.SourceUserId)
                 .OnDelete(DeleteBehavior.Cascade);
-            builder.Entity<UserLike>()
-                .HasOne(s => s.LikedUser)
-                .WithMany(l => l.LikedByUsers)
-                .HasForeignKey(s => s.LikedUserId)
+
+            builder.Entity<UserView>()
+                .HasOne(s => s.ViewedUser)
+                .WithMany(l => l.ViewedByUsers)
+                .HasForeignKey(s => s.ViewedUserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
             builder.Entity<Message>()
                 .HasOne(u => u.Recipient)
                 .WithMany(m => m.MessagesReceived)
                 .OnDelete(DeleteBehavior.Restrict);
+
             builder.Entity<Message>()
                 .HasOne(u => u.Sender)
                 .WithMany(m => m.MessagesSent)
@@ -120,29 +88,21 @@ namespace API.Data
         }
     }
 
-    
-          
-            
-    
+    public static class UtcDateAnnotation
+    {
+        private const String IsUtcAnnotation = "IsUtc";
+        private static readonly ValueConverter<DateTime, DateTime> UtcConverter =
+          new ValueConverter<DateTime, DateTime>(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
-          
-    
-    
-  
-    public static class UtcDateAnnotation
-    {
-        private const String IsUtcAnnotation = "IsUtc";
-        private static readonly ValueConverter<DateTime, DateTime> UtcConverter =
-          new ValueConverter<DateTime, DateTime>(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
         private static readonly ValueConverter<DateTime?, DateTime?> UtcNullableConverter =
           new ValueConverter<DateTime?, DateTime?>(v => v, v => v == null ? v : DateTime.SpecifyKind(v.Value, DateTimeKind.Utc));
+
         public static PropertyBuilder<TProperty> IsUtc<TProperty>(this PropertyBuilder<TProperty> builder, Boolean isUtc = true) =>
           builder.HasAnnotation(IsUtcAnnotation, isUtc);
+
         public static Boolean IsUtc(this IMutableProperty property) =>
           ((Boolean?)property.FindAnnotation(IsUtcAnnotation)?.Value) ?? true;
-        /// <summary>
-        /// Make sure this is called after configuring all your entities.
-        /// </summary>
+
         public static void ApplyUtcDateTimeConverter(this ModelBuilder builder)
         {
             foreach (var entityType in builder.Model.GetEntityTypes())
@@ -153,47 +113,12 @@ namespace API.Data
                     {
                         continue;
                     }
+
                     if (property.ClrType == typeof(DateTime))
                     {
                         property.SetValueConverter(UtcConverter);
                     }
-                    if (property.ClrType == typeof(DateTime?))
-                    {
-                        property.SetValueConverter(UtcNullableConverter);
-                    }
-                }
-            }
-        }
-    }
-}
-    public static class UtcDateAnnotation
-    {
-        private const String IsUtcAnnotation = "IsUtc";
-        private static readonly ValueConverter<DateTime, DateTime> UtcConverter =
-          new ValueConverter<DateTime, DateTime>(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
-        private static readonly ValueConverter<DateTime?, DateTime?> UtcNullableConverter =
-          new ValueConverter<DateTime?, DateTime?>(v => v, v => v == null ? v : DateTime.SpecifyKind(v.Value, DateTimeKind.Utc));
-        public static PropertyBuilder<TProperty> IsUtc<TProperty>(this PropertyBuilder<TProperty> builder, Boolean isUtc = true) =>
-          builder.HasAnnotation(IsUtcAnnotation, isUtc);
-        public static Boolean IsUtc(this IMutableProperty property) =>
-          ((Boolean?)property.FindAnnotation(IsUtcAnnotation)?.Value) ?? true;
-        /// <summary>
-        /// Make sure this is called after configuring all your entities.
-        /// </summary>
-        public static void ApplyUtcDateTimeConverter(this ModelBuilder builder)
-        {
-            foreach (var entityType in builder.Model.GetEntityTypes())
-            {
-                foreach (var property in entityType.GetProperties())
-                {
-                    if (!property.IsUtc())
-                    {
-                        continue;
-                    }
-                    if (property.ClrType == typeof(DateTime))
-                    {
-                        property.SetValueConverter(UtcConverter);
-                    }
+
                     if (property.ClrType == typeof(DateTime?))
                     {
                         property.SetValueConverter(UtcNullableConverter);

@@ -22,4 +22,8 @@ export class MemberCardComponent implements OnInit {
       this.toastr.success('You have liked ' + member.KnownAs);
     })
   }
+  addView(member: Member) {
+    this.memberService.addLike(member.UserName).subscribe();
+  }
+  
 }

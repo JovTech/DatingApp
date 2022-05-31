@@ -96,6 +96,16 @@ export class MembersService {
     return getPaginatedResult<Partial<Member[]>>(this.baseUrl + 'likes', params, this.http);
   }
 
+  addView(username: string) {
+    return this.http.post(this.baseUrl + 'views/' + username, {})
+  }
+
+  getViews(predicate: string, pageNumber, pageSize) {
+    let params = getPaginationHeaders(pageNumber, pageSize);
+    params = params.append('predicate', predicate);
+    return getPaginatedResult<Partial<Member[]>>(this.baseUrl + 'Views', params, this.http);
+  }
+
   private getPaginatedResult<T>(url, params) {
     const paginatedResult: PaginatedResult<T> = new PaginatedResult<T>();
     return this.http.get<T>(url, { observe: 'response', params }).pipe(

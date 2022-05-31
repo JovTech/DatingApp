@@ -16,19 +16,19 @@ namespace API.Data
         public DataContext(DbContextOptions options) : base(options)
         {
         }
-
         public DbSet<UserLike> Likes { get; set; }
         public DbSet<UserView> Views { get; set; }
         public DbSet<Message> Messages { get; set; }
-        public DbSet<Photo> Photos { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<Connection> Connections { get; set; }
-        public object Views { get; internal set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-
+            builder.Entity<Group>()
+                .HasMany(x => x.Connections)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Cascade);
             builder.Entity<AppUser>()
                 .HasMany(ur => ur.UserRoles)
                 .WithOne(u => u.User)
@@ -46,6 +46,7 @@ namespace API.Data
                 .HasKey(k => new { k.SourceUserId, k.LikedUserId });
 
             builder.Entity<UserLike>()
+
                 .HasOne(s => s.SourceUser)
                 .WithMany(l => l.LikedUsers)
                 .HasForeignKey(s => s.SourceUserId)
@@ -61,15 +62,22 @@ namespace API.Data
                 .HasKey(k => new { k.SourceUserId, k.viewedUserId });
 
             builder.Entity<UserView>()
+
                 .HasOne(s => s.SourceUser)
                 .WithMany(l => l.ViewedUsers)
                 .HasForeignKey(s => s.SourceUserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            builder.Entity<UserLike>()
+                .HasOne(s => s.LikedUser)
+                .WithMany(l => l.LikedByUsers)
+                .HasForeignKey(s => s.LikedUserId)
+
             builder.Entity<UserView>()
                 .HasOne(s => s.ViewedUser)
                 .WithMany(l => l.ViewedByUsers)
                 .HasForeignKey(s => s.ViewedUserId)
+
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.Entity<Message>()
@@ -81,8 +89,6 @@ namespace API.Data
                 .HasOne(u => u.Sender)
                 .WithMany(m => m.MessagesSent)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            builder.Entity<Photo>().HasQueryFilter(p => p.IsApproved);
 
             builder.ApplyUtcDateTimeConverter();
         }
@@ -102,6 +108,7 @@ namespace API.Data
 
         public static Boolean IsUtc(this IMutableProperty property) =>
           ((Boolean?)property.FindAnnotation(IsUtcAnnotation)?.Value) ?? true;
+
 
         public static void ApplyUtcDateTimeConverter(this ModelBuilder builder)
         {
@@ -127,4 +134,3 @@ namespace API.Data
             }
         }
     }
-}
